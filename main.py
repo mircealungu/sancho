@@ -1,6 +1,7 @@
 """Sancho: a basic chat agent, inspired by Thorsten Ball's "How to Build an Agent"."""
 
 import claude
+import tools
 
 
 def main():
@@ -16,7 +17,7 @@ def main():
             continue
 
         conversation.append({"role": "user", "content": user_input})
-        message = claude.get_next_answer(conversation)
+        message = claude.get_next_answer(conversation, tools.DEFINITIONS)
         conversation.append({"role": "assistant", "content": message.content})
 
         for block in message.content:
