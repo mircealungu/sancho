@@ -78,3 +78,5 @@ Things to notice:
 - **Empty lines are skipped** because the API rejects a message with empty text.
 
 This is a chatbot, not yet an agent. It can talk, but it can't do anything. That's step 2.
+
+![Sancho step 1: a chat in the terminal](images/step1-chat.png)
