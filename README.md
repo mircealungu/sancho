@@ -4,7 +4,11 @@ A coding agent built from scratch in Python, one small step at a time.
 
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same thing in Go. His point: an agent is not magic, it's "an LLM, a loop, and enough tokens". Python lets us show that with even less ceremony.
 
-Each step below is one commit, so you can check out any step and run it.
+Each step below ends at a git tag (`step1`, `step2`, ...), so you can check out any step and run it:
+
+```bash
+git checkout step1
+```
 
 ## Setup
 
