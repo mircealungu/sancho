@@ -26,14 +26,30 @@ Sancho talks to Claude through the Messages API. The whole agent rests on four f
 
 In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what the API sees.
 
-## Step 1: a chatbot
+## Talking to Claude: a thin wrapper
 
-The smallest useful thing: read a line, send it to Claude, print the answer, repeat.
+All calls to Claude go through one small file, `claude.py`. It's the only file that imports `anthropic`.
+
+It exists because I don't like one of the SDK's names. To get Claude's next answer, the SDK has you call `client.messages.create(...)`, which reads as "create a message". So we wrap it in a function whose name says what we actually want:
 
 ```python
 client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
 
+def get_next_answer(conversation):
+    """Send the whole conversation to Claude and return its reply."""
+    return client.messages.create(model=MODEL, max_tokens=16000, messages=conversation)
+```
+
+Underneath it's one HTTP POST to `/v1/messages`, which blocks until the reply is complete. `max_tokens` caps the length of the reply. The wrapper only renames: it takes the conversation in the API's format and returns the API's reply object unchanged.
+
+In `main.py` we `import claude`, so every call reads `claude.get_next_answer(...)` and you can see exactly where the code talks to Claude.
+
+## Step 1: a chatbot
+
+The smallest useful thing: read a line, send it to Claude, print the answer, repeat.
+
+```python
 def main():
     conversation = []
     print("Sancho. At your service 🫡 (Ctrl-D to quit)")
@@ -47,7 +63,7 @@ def main():
             continue
 
         conversation.append({"role": "user", "content": user_input})
-        message = client.messages.create(model=MODEL, max_tokens=16000, messages=conversation)
+        message = claude.get_next_answer(conversation)
         conversation.append({"role": "assistant", "content": message.content})
 
         for block in message.content:
@@ -57,11 +73,8 @@ def main():
 
 Things to notice:
 
-- **`conversation` is Sancho's whole memory.** Because the API is stateless, we send the full list every turn and append Claude's reply to it. Delete the second `append` and Sancho forgets everything it said.
-- **`client.messages.create(...)` is the only line that talks to Claude.** It's one HTTP POST to `/v1/messages`, and it blocks until the reply is complete. `max_tokens` caps the length of the reply.
+- **`conversation` is Sancho's whole memory.** Because the API is stateless, we send the full list every turn and append Claude's reply to it.
 - **We print only the `text` blocks.** The model may also return a `thinking` block (its reasoning, empty by default), so we don't assume the first block is the answer.
 - **Empty lines are skipped** because the API rejects a message with empty text.
-
-Try it: tell Sancho your name, then ask for it a few turns later. It remembers, but only because we resend the history.
 
 This is a chatbot, not yet an agent. It can talk, but it can't do anything. That's step 2.

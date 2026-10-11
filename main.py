@@ -1,10 +1,6 @@
 """Sancho: a basic chat agent, inspired by Thorsten Ball's "How to Build an Agent"."""
 
-import anthropic
-
-MODEL = "claude-sonnet-5-5"
-
-client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
+import claude
 
 
 def main():
@@ -20,7 +16,7 @@ def main():
             continue
 
         conversation.append({"role": "user", "content": user_input})
-        message = client.messages.create(model=MODEL, max_tokens=16000, messages=conversation)
+        message = claude.get_next_answer(conversation)
         conversation.append({"role": "assistant", "content": message.content})
 
         for block in message.content:
