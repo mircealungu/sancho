@@ -51,6 +51,9 @@ In `main.py` we `import claude`, so every call reads `claude.get_next_answer(...
 
 ## Step 1: a chatbot
 
+> [!TIP]
+> Code for this step: `git checkout step1`
+
 The smallest useful thing: read a line, send it to Claude, print the answer, repeat.
 
 ```python
