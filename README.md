@@ -711,6 +711,9 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
 - **Permissions.** Chapter 6 asks y/N before every run. Real agents grow that into rules: "always allow `pytest`", "never
   `git push`", "ask for anything outside this folder", modes for when you're watching and when you're not. Where do the
   rules live, and who may change them?
+- **Commands.** `adiós` is already a command: Sancho handles it himself and never sends it to Claude. Make that a
+  rule: anything starting with `/` is for Sancho. `/yolo` turns permissions off mid-conversation, `/clear` forgets the
+  conversation, `/help` lists the commands. Which should be commands, and which are better left to Claude?
 - **More tools.** Search across files, fetch a web page, look at an image. Which ones need asking first, and which
   ones need a limit on how much they return?
 - **Safer hands.** Keep Sancho inside the project folder, show a diff before every edit, commit each change to git so
