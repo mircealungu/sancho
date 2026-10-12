@@ -626,9 +626,10 @@ imperfect answers:
 None of them is great. It's the same trade-off as with any assistant you give real power to: the more of its work you
 have to check, the less work it saves you. Which brings me to one of my research project ideas: a fleet of many specialized limited agents.
 
-### Who protects us from Claude?
+### Sancho must protect us from... Claude!
 
-Claude never touches your machine. It can only ask; Sancho decides what actually happens. That makes Sancho the gate
+Sancho's mind is Claude, and his job is to protect us from it. Claude never touches your machine. It can only ask;
+Sancho decides what actually happens. That makes Sancho the gate
 between a model we don't control and the computer we care about, and the gate is our code.
 
 Claude can go wrong in two ways: it makes a mistake, or it gets steered by something it reads. A README, a web page or
