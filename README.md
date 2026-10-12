@@ -8,7 +8,7 @@
   The pictures at the top of the steps were made with Gemini, from this one.</sub>
 </p>
 
-A coding agent in about 250 lines of Python, built from scratch one small step at a time.
+A coding agent in about 300 lines of Python, built from scratch one small step at a time.
 
 # Inspiration
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
@@ -31,6 +31,7 @@ git checkout step1
 | [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
 | [4. A tool for looking around](#step-4-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
 | [5. A tool for editing files](#step-5-a-tool-for-editing-files) | `step5` | change files | `edit_file`: search and replace, one match only |
+| [6. A tool for running programs](#step-6-a-tool-for-running-programs) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
 
 ## Setup
 
@@ -491,7 +492,90 @@ Ask Sancho to change something in its own repo:
 It listed the folder, read `requirements.txt`, went looking in `.venv` for the installed version, and then made a
 one-line edit.
 
-That's the whole agent: an LLM, a loop, and three tools.
+That's a coding agent: an LLM, a loop, and three tools.
+
+## Step 6: a tool for running programs
+
+<p align="center"><img src="images/step6-sancho.jpg" alt="Sancho holding a smoldering linstock next to an unlit cannon, hesitating, while Don Quixote covers his ears" width="300"></p>
+
+> [!TIP]
+> Code for this step: `git checkout step6`
+
+The last tool is the most powerful one: running programs. With it Sancho can run the tests, use git, try the code it
+just wrote. It's also the first tool whose mistakes can't be undone.
+
+We didn't write this one. We asked Sancho to add it to itself:
+
+![Sancho adding a tool to its own code](images/step6-build.png)
+
+It looked around, read its own code, said what it would do ("a definition, a function, and an entry in the two
+lookups"), and made small edits, each with an `old_str` that appears exactly once.
+
+```python
+def run_program(program, args=None, timeout_seconds=DEFAULT_TIMEOUT):
+    command = [program] + list(args or [])
+    try:
+        completed = subprocess.run(
+            command,
+            stdin=subprocess.DEVNULL,  # a program that waits for input must not hang Sancho
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            errors="replace",
+            timeout=timeout_seconds,
+        )
+    except subprocess.TimeoutExpired as e:
+        output = e.stdout.decode(errors="replace") if isinstance(e.stdout, bytes) else (e.stdout or "")
+        raise RuntimeError(
+            f"{program} was killed after {timeout_seconds} seconds. Output so far:\n{_shorten(output)}"
+        )
+
+    return f"{_shorten(completed.stdout) or '(no output)'}\n[exit code {completed.returncode}]"
+```
+
+Sancho made some good choices we hadn't asked for:
+
+- **No shell.** The program and its arguments are passed separately, so there are no pipes, no `;`, no way to sneak
+  a second command into an argument. The description tells Claude so.
+- **`stdin=subprocess.DEVNULL`.** A program that waits for input fails instead of freezing Sancho.
+- **A non-zero exit code is not a tool error.** Failing tests come back as output with `[exit code 1]`, for Claude to
+  read.
+- **Long output keeps both ends.** The start says what ran; the end usually says what failed:
+
+```python
+def _shorten(text):
+    """Keep the start and the end of long output: the start says what ran, the end usually says what failed."""
+    if len(text) <= MAX_OUTPUT:
+        return text
+    half = MAX_OUTPUT // 2
+    return text[:half] + f"\n... ({len(text) - MAX_OUTPUT} characters left out) ...\n" + text[-half:]
+```
+
+### Safety you have to ask for
+
+Our first request was just "add a tool that runs a local program". Sancho built all of the above, and no
+confirmation: it would have run whatever Claude asked for. Only when we asked for it did Sancho add a question before
+every run:
+
+```python
+NEEDS_CONFIRMATION = {RUN_PROGRAM["name"]}
+
+
+def confirm(call):
+    """Ask the user before running a tool that acts on the world. Raises if they decline."""
+    command = shlex.join([call.input.get("program", "")] + list(call.input.get("args") or []))
+    try:
+        answer = input(f"\033[33mRun `{command}`? [y/N] \033[0m")
+    except EOFError:  # Ctrl-D: no answer is a no
+        answer = ""
+    if answer.strip().lower() not in ("y", "yes"):
+        raise PermissionError("The user declined to run this program. Do not retry it; ask what they want instead.")
+```
+
+`run` calls `confirm(call)` before any tool in `NEEDS_CONFIRMATION`. A "no" is an exception, so step 3 turns it into
+an error result, and the message tells Claude not to simply try again.
+
+The agent engineered carefully what we asked for. What we didn't ask for, it didn't do.
 
 ## Exercises
 
@@ -499,9 +583,9 @@ That's the whole agent: an LLM, a loop, and three tools.
   Pass `thinking={"type": "adaptive", "display": "summarized"}` to `messages.create` to get a readable summary, then
   write a `claude.thinking_of(message)` next to `text_of` (the block type is `"thinking"`, its text is in
   `block.thinking`) and print it in gray. Not every reply thinks: ask something that needs a decision.
-- **Ask before writing.** `edit_file` changes files without asking. Make Sancho show the edit and ask
-  `Apply? [y/N]` first, and when you answer no, send Claude an error result saying the user declined. Where does that
-  question belong: in `tools.py`, or in `main.py`?
+- **Ask before writing.** Step 6 asks before running a program, but `edit_file` still changes files without asking.
+  Add it to `NEEDS_CONFIRMATION`. What should `confirm` show for an edit, so you can judge it?
+- **Cap the timeout.** Claude chooses `timeout_seconds`, so nothing stops it from asking for an hour. Cap it.
 - **Forget old tool results.** Every turn resends the whole conversation, including every file Sancho ever read. Ask
   about a few files, then watch `message.usage.input_tokens` grow. Make Sancho forget old tool results. Before you
   write code: can you simply delete an old `tool_result` from the conversation? What does the API say about a
@@ -536,6 +620,8 @@ Things that weren't obvious while building Sancho.
   lets it explore only what it needs.
 - **Edit by search and replace, with exactly one match.** Claude sends only what changes, can't drop the rest of a file
   by accident, and is asked for more context instead of us guessing which match it meant.
+- **Safety you have to ask for.** Asked to add a tool that runs programs, Sancho added timeouts, output limits and no
+  shell, but no confirmation. The agent does carefully what it is asked, and nothing it isn't.
 
 **About the code**
 
