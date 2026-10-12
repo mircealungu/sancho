@@ -5,7 +5,7 @@
   <br>
   <sub>Image: <a href="https://easy-peasy.ai/ai-image-generator/images/don-quijote-sancho-panza-la-mancha-spain">Easy-Peasy.AI</a>,
   <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; everything but Sancho grayed out.
-  The pictures at the top of the steps were made with Gemini, from this one.</sub>
+  The pictures at the top of the chapters were made with Gemini, from this one.</sub>
 </p>
 
 A coding agent in about 300 lines of Python, built from scratch one small step at a time.
@@ -18,20 +18,20 @@ Also, I think it was [Andrzej Wąsowski](https://wasowski.dukla.ch) whom I heard
  
 
 # Implementation
-Each step below ends at a git tag (`step1`, `step2`, ...), so you can check out any step and run it:
+Each chapter below ends at a git tag (`step1`, `step2`, ...), so you can check out any chapter and run it:
 
 ```bash
 git checkout step1
 ```
 
-| Step | Tag | What Sancho can do | What's new in the code |
+| Chapter | Tag | What Sancho can do | What's new in the code |
 |---|---|---|---|
-| [1. A chatbot](#step-1-a-chatbot) | `step1` | talk | the chat loop; the conversation is its memory |
-| [2. A fool, but with a tool](#step-2-a-fool-but-with-a-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
-| [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
-| [4. A tool for looking around](#step-4-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
-| [5. A tool for editing](#step-5-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only |
-| [6. Sancho creates a powerful tool for himself](#step-6-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
+| [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory |
+| [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
+| [3. A tool breaks and Sancho carries on](#chapter-3-in-which-a-tool-breaks-and-sancho-carries-on) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
+| [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
+| [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only |
+| [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
 
 ## Setup
 
@@ -50,19 +50,19 @@ Sancho talks to Claude through the Messages API. The whole agent rests on four f
 
 1. **It is stateless.** Claude remembers nothing between calls. Every request carries the whole conversation so far, so keeping the conversation is the client's job.
 2. **Roles alternate.** The conversation is a list of messages with `"role": "user"` and `"role": "assistant"`, taking turns, starting with the user.
-3. **A reply is a** list of content blocks**, not a string.** In step 1 we only care about `text` blocks. Later, tool calls
+3. **A reply is a** list of content blocks**, not a string.** In chapter 1 we only care about `text` blocks. Later, tool calls
    arrive as blocks too.
 4. **`stop_reason` says what happens next.** `"end_turn"` means Claude is done and it's our turn. Later, `"tool_use"`
    will mean Claude wants us to run something.
 
 In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what the API sees.
 
-## Step 1: a chatbot
+## Chapter 1, in which Sancho learns to talk
 
 <p align="center"><img src="images/step1-sancho.jpg" alt="Sancho on his donkey, telling Don Quixote a long story with empty hands" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step1`
+> Code for this chapter: `git checkout step1`
 
 The smallest useful thing: read a line, send it to Claude, print the answer, repeat.
 
@@ -98,7 +98,7 @@ Things to notice:
 - **`claude.get_next_answer` is the one place that talks to Claude.** It's a thin wrapper around the SDK; see the
   note below.
 
-<img src="images/step1-chat.png" alt="Sancho step 1: a chat in the terminal" width="640">
+<img src="images/step1-chat.png" alt="Sancho chapter 1: a chat in the terminal" width="640">
 
 <details>
 <summary>A note on <code>claude.py</code></summary>
@@ -108,21 +108,21 @@ has you call `client.messages.create(...)`, which reads as "create a message". S
 does that call under a name that says what we want.
 
 The module will be useful beyond the name. It's the only file that imports `anthropic`, so everything that knows how
-the API works goes there: in step 2 it learns to pick the text and the tool calls out of a reply, so the rest of
+the API works goes there: in chapter 2 it learns to pick the text and the tool calls out of a reply, so the rest of
 Sancho doesn't have to know what a reply looks like inside.
 
 </details>
 
-This is a chatbot, not yet an agent. It can talk, but it can't do anything. That's step 2.
+This is a chatbot, not yet an agent. It can talk, but it can't do anything. That's chapter 2.
 
-## Step 2: A fool, but with a tool
+## Chapter 2, in which Sancho gets his first tool
 
 <p align="center"><img src="images/step2-sancho.jpg" alt="Sancho proudly holding up a big wrench, Don Quixote puzzled" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step2`
+> Code for this chapter: `git checkout step2`
 
-An agent is a chatbot that can do things. Sancho's first ability: reading a file.
+An agent is a chatbot that can do things: a fool, but with a tool. Sancho's first ability: reading a file.
 
 Claude can't touch your disk, but it can ask. We tell it which tools exist; when it wants one, it stops and replies with
 a request instead of an answer; we run the tool and send back the result. Claude never runs anything itself. Sancho
@@ -243,7 +243,7 @@ Things to notice:
 
 - **Two loops, two turns.** The loop in `main` is your turn: it waits for input. `agent_loop` is the agent working:
   one question from you can take several rounds with Claude, and you type nothing in between. `agent_loop` is the whole
-  difference between the chatbot of step 1 and an agent.
+  difference between the chatbot of chapter 1 and an agent.
 - **There is one place that asks Claude.** Ask, record, show, stop if Claude is done; otherwise run the tools, answer,
   and ask again.
 - **All results go back in one user message.** Claude can ask for several tools in one reply; the answers travel
@@ -259,20 +259,20 @@ Things to notice:
 
 Ask about a file and watch Sancho read it:
 
-<img src="images/step2-read-file.png" alt="Sancho step 2: reading requirements.txt" width="640">
+<img src="images/step2-read-file.png" alt="Sancho chapter 2: reading requirements.txt" width="640">
 
 Now ask about a file that doesn't exist:
 
-<img src="images/step2-crash.png" alt="Sancho step 2: crashing on a missing file" width="640">
+<img src="images/step2-crash.png" alt="Sancho chapter 2: crashing on a missing file" width="640">
 
-`open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is step 3.
+`open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is chapter 3.
 
-## Step 3: when tools fail
+## Chapter 3, in which a tool breaks and Sancho carries on
 
 <p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step3`
+> Code for this chapter: `git checkout step3`
 
 A tool that fails shouldn't take Sancho down. The error is information: if Claude learns that `notex.txt` doesn't
 exist, it can say so, or try another path. So instead of crashing, we send the error back as the tool's result:
@@ -317,12 +317,12 @@ Things to notice:
 
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
 
-## Step 4: a tool for looking around
+## Chapter 4, in which Sancho gets a tool for looking around
 
 <p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step4`
+> Code for this chapter: `git checkout step4`
 
 So far you have to name the file. With a second tool, `list_folder`, Sancho can look around first and find what it needs
 itself.
@@ -387,17 +387,17 @@ it to the two lookups; `**call.input` takes care of the arguments, whatever they
 
 Ask about the project without naming a file:
 
-<img src="images/step4-explore.png" alt="Sancho step 4: exploring the project" width="640">
+<img src="images/step4-explore.png" alt="Sancho chapter 4: exploring the project" width="640">
 
 Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `README.md` in the listing, read it, and
 answered. You can watch the agent decide what to look at.
 
-## Step 5: a tool for editing
+## Chapter 5, in which Sancho gets a tool for editing
 
 <p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step5`
+> Code for this chapter: `git checkout step5`
 
 Sancho can look around and read. The last tool lets it write: `edit_file` replaces one piece of text in a file with
 another.
@@ -438,7 +438,7 @@ Things to notice:
 - **`old_str` must appear exactly once.** If it appears twice, we don't guess which one Claude meant; we ask it for
   more context. To know `old_str`, Claude has to have read the file, so `read_file` then `edit_file` becomes the
   natural pattern.
-- **Every failure is a `raise`.** Step 3 turns exceptions into `is_error` results, so Claude reads "appears 2 times;
+- **Every failure is a `raise`.** Chapter 3 turns exceptions into `is_error` results, so Claude reads "appears 2 times;
   include more context" and tries again.
 - **The same tool creates files:** an empty `old_str` and a file that doesn't exist yet. It refuses to create over an
   existing file, so a create can't silently overwrite.
@@ -475,19 +475,19 @@ EDIT_FILE = {
 
 Ask Sancho to change something in its own repo:
 
-<img src="images/step5-edit.png" alt="Sancho step 5: pinning its own dependency" width="640">
+<img src="images/step5-edit.png" alt="Sancho chapter 5: pinning its own dependency" width="640">
 
 It listed the folder, read `requirements.txt`, went looking in `.venv` for the installed version, and then made a
 one-line edit.
 
 That's a coding agent: an LLM, a loop, and three tools.
 
-## Step 6: Sancho creates a powerful tool for himself
+## Chapter 6, in which Sancho creates a powerful tool for himself
 
 <p align="center"><img src="images/step6-forge.jpg" alt="Sancho hammering a cannon barrel on an anvil, Don Quixote backing away behind his shield" width="300"></p>
 
 > [!NOTE]
-> Code for this step: `git checkout step6`
+> Code for this chapter: `git checkout step6`
 
 The last tool is the most powerful one: running programs. With it Sancho can run the tests, use git, try the code it
 just wrote. It's also the first tool whose mistakes can't be undone.
@@ -562,12 +562,12 @@ def confirm(call):
         raise PermissionError("The user declined to run this program. Do not retry it; ask what they want instead.")
 ```
 
-`run` calls `confirm(call)` before any tool in `NEEDS_CONFIRMATION`. A "no" is an exception, so step 3 turns it into
+`run` calls `confirm(call)` before any tool in `NEEDS_CONFIRMATION`. A "no" is an exception, so chapter 3 turns it into
 an error result, and the message tells Claude not to simply try again.
 
 The agent engineered carefully what we asked for. What we didn't ask for, it didn't do.
 
-## What next?
+## What next, or the road ahead
 
 <p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
 
@@ -581,13 +581,13 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
 - **Skills.** Folders of instructions (and scripts) for particular jobs: "how we write release notes", "how to
   deploy". Only their names and one-line descriptions sit in the conversation; Sancho reads a skill's full text when
   a task needs it. How is that different from a tool, and what does it save?
-- **Permissions.** Step 6 asks y/N before every run. Real agents grow that into rules: "always allow `pytest`", "never
+- **Permissions.** Chapter 6 asks y/N before every run. Real agents grow that into rules: "always allow `pytest`", "never
   `git push`", "ask for anything outside this folder", modes for when you're watching and when you're not. Where do the
   rules live, and who may change them?
 - **More tools.** Search across files, fetch a web page, look at an image. Which ones need asking first, and which
   ones need a limit on how much they return?
 - **Safer hands.** Keep Sancho inside the project folder, show a diff before every edit, commit each change to git so
-  any step can be undone.
+  any change can be undone.
 - **Prompt injection.** A file Sancho reads can contain instructions. Write one that makes Sancho misbehave, then
   defend against it.
 - **Helpers.** A tool that starts a second Sancho, with a fresh conversation, for a side task. When is a helper worth
@@ -603,7 +603,7 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
   Pass `thinking={"type": "adaptive", "display": "summarized"}` to `messages.create` to get a readable summary, then
   write a `claude.thinking_of(message)` next to `text_of` (the block type is `"thinking"`, its text is in
   `block.thinking`) and print it in gray. Not every reply thinks: ask something that needs a decision.
-- **Ask before writing.** Step 6 asks before running a program, but `edit_file` still changes files without asking.
+- **Ask before writing.** Chapter 6 asks before running a program, but `edit_file` still changes files without asking.
   Add it to `NEEDS_CONFIRMATION`. What should `confirm` show for an edit, so you can judge it?
 - **Cap the timeout.** Claude chooses `timeout_seconds`, so nothing stops it from asking for an hour. Cap it.
 - **Forget old tool results.** Every turn resends the whole conversation, including every file Sancho ever read. Ask
