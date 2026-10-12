@@ -565,7 +565,7 @@ an error result, and the message tells Claude not to simply try again.
 
 The agent engineered carefully what we asked for. What we didn't ask for, it didn't do.
 
-## What next, or the road ahead
+## Epilogue, or the road ahead
 
 <p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
 
