@@ -11,8 +11,9 @@ A coding agent in less than 200 lines of Python, built from scratch one small st
 
 # Inspiration
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
-thing in Go. His point: an agent is not magic, it's "an LLM, a loop, and enough tokens". Python lets us show that with
-even less ceremony.
+thing in Go. His point: an agent is not magic, it's "an LLM, a loop, and enough tokens". Python lets us show that with even less ceremony.
+
+Also, I think it was Andrzej Wachowski whom I heard first say that *"we have to teach our students how to create coding agents not how to use them"* 
  
 
 # Implementation
