@@ -35,13 +35,13 @@ def agent_loop(conversation):
 
 def main():
     conversation = []
-    print("Sancho. At your service 🫡 (Ctrl-D to quit)")
+    print("Sancho. At your service 🫡 (adiós or Ctrl-D to quit)")
 
     try:
         while True:
             user_input = input("\nYou: ")
 
-            if user_input.strip().lower() in ["quit", "exit"]:
+            if user_input.strip().lower() in ["quit", "exit", "adios", "adiós"]:
                 break
 
             if not user_input.strip():
