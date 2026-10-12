@@ -18,7 +18,8 @@ Also, I think it was [Andrzej Wąsowski](https://wasowski.dukla.ch) whom I heard
  
 
 # Implementation
-Each chapter below ends at a git tag (`step1`, `step2`, ...), so you can check out any chapter and run it:
+Each chapter below ends at a git tag (`step1`, `step2`, ...), so you can check out any chapter and run its code. The
+tags hold the code; this README, on `main`, tells the whole story:
 
 ```bash
 git checkout step1
@@ -28,7 +29,7 @@ git checkout step1
 |---|---|---|---|
 | [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory |
 | [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
-| [3. A tool breaks and Sancho carries on](#chapter-3-in-which-a-tool-breaks-and-sancho-carries-on) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
+| [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you |
 | [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
 | [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only |
 | [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
@@ -267,7 +268,7 @@ Now ask about a file that doesn't exist:
 
 `open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is chapter 3.
 
-## Chapter 3, in which a tool breaks and Sancho carries on
+## Chapter 3, in which things break and Sancho carries on
 
 <p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="300"></p>
 
@@ -310,12 +311,40 @@ Things to notice:
 
 - **`"is_error": True`** tells Claude the tool failed, so it reads `str(e)` as an error message and not as the file's
   contents.
-- **The lookup is inside the `try` too.** If Claude asks for a tool that doesn't exist, `FUNCTIONS[block.name]` raises
+- **The lookup is inside the `try` too.** If Claude asks for a tool that doesn't exist, `FUNCTIONS[call.name]` raises
   `KeyError`, and that becomes an error result as well.
 - **Every `tool_use` still gets exactly one `tool_result`.** The API requires an answer for each request, and failing
   is an answer.
 
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
+
+### When Claude itself can't be reached
+
+Sometimes the failure isn't in a tool but between Sancho and Claude: no network, an overloaded API, a rate limit. That
+error can't go to Claude, because Claude is the one we can't reach. It has to go to you, and Sancho should wait for your
+next message instead of dying.
+
+`claude.py` gives the SDK's error a name of ours, so `main.py` doesn't have to import `anthropic`:
+
+```python
+# Raised when Claude can't be reached: no network, overloaded, rate-limited, ...
+# (the SDK has already retried twice by then).
+Unreachable = anthropic.APIError
+```
+
+and `main` catches it around the agent's turn:
+
+```python
+            try:
+                agent_loop(conversation)
+            except claude.Unreachable as e:
+                print(f"Sancho can't reach Claude right now: {e} Try again in a moment.")
+```
+
+The conversation stays as it is, so your next message simply continues it.
+
+So a failure has an addressee: a tool error goes to Claude, who can adapt; a connection error goes to you, who can
+wait.
 
 ## Chapter 4, in which Sancho gets a tool for looking around
 
