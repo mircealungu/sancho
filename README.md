@@ -688,10 +688,11 @@ library fixes both:
 import readline  # importing it is enough: input() gets line editing and history
 ```
 
-Two last touches: a blank line before every `You:`, so each turn stands apart, and a proper way to say goodbye. Type
-`adiós` (or `quit`), and Sancho leaves.
+A few last touches. Sancho greets you the way he did in chapter 1, before he even knew his name: "¡A sus órdenes, mi
+señor!" There's a blank line before every `You:`, so each turn stands apart. And there's a proper way to say goodbye:
+type `adiós` (or `quit`), and Sancho leaves.
 
-Sancho added `rich` himself; the `readline` line, the blank line and the `adiós` are ours.
+Sancho added `rich` himself; the `readline` line and the last touches are ours.
 
 ## Epilogue, or the road ahead
 

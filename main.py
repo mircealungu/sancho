@@ -35,7 +35,7 @@ def agent_loop(conversation):
 
 def main():
     conversation = []
-    print("Sancho. At your service 🫡 (adiós or Ctrl-D to quit)")
+    print("Sancho: ¡A sus órdenes, mi señor! 🫡  (adiós or Ctrl-D to quit)")
 
     try:
         while True:
