@@ -9,10 +9,13 @@
 
 A coding agent in less than 200 lines of Python, built from scratch one small step at a time.
 
+# Inspiration
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
 thing in Go. His point: an agent is not magic, it's "an LLM, a loop, and enough tokens". Python lets us show that with
 even less ceremony.
+ 
 
+# Implementation
 Each step below ends at a git tag (`step1`, `step2`, ...), so you can check out any step and run it:
 
 ```bash
@@ -29,6 +32,8 @@ git checkout step1
 
 ## Setup
 
+Sancho works with the Anthropic API. You need an Anthropic API key to run this example. 
+
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -36,23 +41,20 @@ export ANTHROPIC_API_KEY=...
 python main.py
 ```
 
-## Before the code: four things about the API
+## Prerequisite: A few facts about the Anthropic API
 
 Sancho talks to Claude through the Messages API. The whole agent rests on four facts about it:
 
-1. **It is stateless.** Claude remembers nothing between calls. Every request carries the whole conversation so far, so
-   keeping the conversation is the client's job.
-2. **Roles alternate.** The conversation is a list of messages with `"role": "user"` and `"role": "assistant"`, taking
-   turns, starting with the user.
-3. **A reply is a list of content blocks, not a string.** For now we only care about `text` blocks. Later, tool calls
+1. **It is stateless.** Claude remembers nothing between calls. Every request carries the whole conversation so far, so keeping the conversation is the client's job.
+2. **Roles alternate.** The conversation is a list of messages with `"role": "user"` and `"role": "assistant"`, taking turns, starting with the user.
+3. **A reply is a** list of content blocks**, not a string.** In step 1 we only care about `text` blocks. Later, tool calls
    arrive as blocks too.
 4. **`stop_reason` says what happens next.** `"end_turn"` means Claude is done and it's our turn. Later, `"tool_use"`
    will mean Claude wants us to run something.
 
-In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what
-the API sees.
+In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what the API sees.
 
-## Talking to Claude: a thin wrapper
+## Step 0: Talking to Claude: a thin wrapper
 
 All calls to Claude go through one small file, `claude.py`. It's the only file that imports `anthropic`.
 
@@ -61,6 +63,9 @@ It exists because I don't like one of the SDK's names. To get Claude's next answ
 actually want:
 
 ```python
+
+import anthropic
+
 client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
 
