@@ -33,6 +33,10 @@ def main():
     try:
         while True:
             user_input = input("You: ")
+
+            if user_input.strip().lower() in ["quit", "exit"]:
+                break
+
             if not user_input.strip():
                 continue
 
