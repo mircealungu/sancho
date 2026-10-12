@@ -23,13 +23,17 @@ Your own code is in {OWN_CODE_FOLDER}, so you can read it to learn how you work.
 If you change your own code, the changes take effect only after the user restarts you.
 Keep your answers short: they are shown in a terminal."""
 
+YOLO_PROMPT = """
 
-def get_next_answer(conversation, tools):
+Permissions are off: your programs run without the user confirming. Before anything that can't be undone, ask the user in your reply instead of running it: deleting or overwriting files, and anything that reaches beyond this computer, like git push or publishing."""
+
+
+def get_next_answer(conversation, tools, yolo=False):
     """Send the whole conversation and the tools to Claude, and return its reply."""
     return client.messages.create(
         model=MODEL,
         max_tokens=16000,
-        system=SYSTEM_PROMPT,
+        system=SYSTEM_PROMPT + (YOLO_PROMPT if yolo else ""),
         messages=conversation,
         tools=tools,
     )

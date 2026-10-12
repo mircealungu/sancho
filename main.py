@@ -1,6 +1,7 @@
 """Sancho: a basic chat agent, inspired by Thorsten Ball's "How to Build an Agent"."""
 
 import readline  # importing it is enough: input() gets line editing and history
+import sys
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -14,7 +15,7 @@ console = Console()
 def agent_loop(conversation):
     """Keep asking Claude, and running the tools it asks for, until it's done."""
     while True:
-        message = claude.get_next_answer(conversation, tools.DEFINITIONS)
+        message = claude.get_next_answer(conversation, tools.DEFINITIONS, yolo=tools.yolo)
 
         # Every reply goes into the conversation, tool calls included: the API
         # matches each tool_result to a tool_use in the previous assistant message,
@@ -35,6 +36,11 @@ def agent_loop(conversation):
 
 def main():
     conversation = []
+    if "--yolo" in sys.argv:
+        tools.yolo = True
+        print(
+            "\033[33mWarning: --yolo is on. Sancho will run programs without asking.\033[0m"
+        )
     print("Sancho: ¡A sus órdenes, mi señor! 🫡  (adiós or Ctrl-D to quit)")
 
     try:

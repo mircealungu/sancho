@@ -184,9 +184,13 @@ FUNCTIONS = {
 
 NEEDS_CONFIRMATION = {RUN_PROGRAM["name"]}
 
+yolo = False  # set by main.py for --yolo: confirm() then never asks
+
 
 def confirm(call):
     """Ask the user before running a tool that acts on the world. Raises if they decline."""
+    if yolo:
+        return
     command = shlex.join([call.input.get("program", "")] + list(call.input.get("args") or []))
     try:
         answer = input(f"\033[33mRun `{command}`? [y/N] \033[0m")

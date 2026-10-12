@@ -35,6 +35,7 @@ git checkout step1
 | [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run | Sancho |
 | [7. Sancho learns who he is](#chapter-7-in-which-sancho-learns-who-he-is) | `step7` | know his name, his folder, and his own code | a system prompt; the `sancho` command | Sancho |
 | [8. Sancho gets dressed up](#chapter-8-in-which-sancho-gets-dressed-up) | `step8` | speak in Markdown, take edited input | `rich` for output, `readline` for input | Sancho and us |
+| [9. Sancho is let off the leash](#chapter-9-in-which-sancho-is-let-off-the-leash) | `step9` | run programs without asking, if you dare | `--yolo`; a sentence in the system prompt instead of a question | Sancho |
 
 ## Setup
 
@@ -694,6 +695,50 @@ type `adiós` (or `quit`), and Sancho leaves.
 
 Sancho added `rich` himself; the `readline` line and the last touches are ours.
 
+## Chapter 9, in which Sancho is let off the leash
+
+<p align="center"><img src="images/step9-sancho.jpg" alt="Sancho on a hilltop with his own banner, the cannon behind him with its fuse lit, Don Quixote far below waving 'wait!'" width="300"></p>
+
+> [!NOTE]
+> Code for this chapter: `git checkout step9`
+
+Chapter 6 ended with the trouble with saying yes again and again. This chapter takes the third way out: don't ask. Start
+Sancho with `sancho --yolo`, and `confirm()` stops asking:
+
+```python
+yolo = False  # set by main.py for --yolo: confirm() then never asks
+
+
+def confirm(call):
+    """Ask the user before running a tool that acts on the world. Raises if they decline."""
+    if yolo:
+        return
+    ...
+```
+
+The name comes from pi, which runs this way by default. Claude Code calls the same switch
+`--dangerously-skip-permissions`; the long, scary name is a safety feature of its own.
+
+Not asking at all felt like too much, so `--yolo` also adds a sentence to the system prompt:
+
+```python
+YOLO_PROMPT = """
+
+Permissions are off: your programs run without the user confirming. Before anything that can't be undone, ask the user in your reply instead of running it: deleting or overwriting files, and anything that reaches beyond this computer, like git push or publishing."""
+```
+
+It works. `echo hi` ran without a question, and "delete notes.txt" got this answer instead: *"Deleting notes.txt can't
+be undone. Do you want me to go ahead and delete it? Reply 'yes' to confirm."*
+
+Things to notice:
+
+- **"Can't be undone" has two kinds.** Deleting or overwriting destroys something here. `git push` destroys nothing,
+  but it leaves your computer, and you can't take it back once others have seen it.
+- **This is a promise, not a lock.** In chapter 7 we said rules that matter belong in code, where they can't be talked
+  out of. This one is in the prompt: it relies on Claude judging what can't be undone, and a file Sancho reads could
+  try to talk it out of the rule. That's the price of `--yolo`, paid knowingly.
+- **Run it where it can't do much harm:** a throwaway checkout, a container, a folder that's in git.
+
 ## Epilogue, or the road ahead
 
 <p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
@@ -752,6 +797,10 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
   steal: a summary per tool instead of its arguments ("Read README.md, 240 lines"), a diff for every edit, the first few
   lines of a program's output with the rest folded away, a spinner while Claude thinks, the answer appearing word by
   word (streaming). For each one: what does it help you notice that you'd otherwise miss?
+- **The middle way.** Give `run_program` a `destructive` parameter that Claude must fill in, and let `confirm()` ask
+  only for destructive commands, even under `--yolo`. Now the model judges and the code enforces. Who should judge:
+  the model that wants to run the command, or a second one? (That is the design question behind Claude Code's auto
+  mode.)
 
 ## Lessons learned
 
