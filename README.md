@@ -642,13 +642,20 @@ timeout, and it limits how much output goes back.
 What it doesn't do yet:
 
 - **Paths aren't confined.** `read_file("../../.ssh/id_rsa")` works, and so does `edit_file` anywhere you can write.
-  Reading isn't harmless either: whatever Sancho reads goes into the conversation, and so to Claude's API.
+  Sancho runs as you, so he can read everything you can; file permissions protect you from other users, not from the
+  programs you start. Reading isn't harmless either: whatever Sancho reads goes into the conversation, and so to
+  Claude's API.
 - **Edits aren't confirmed.** `edit_file` changes files without asking (an exercise).
 - **`--yolo` gives the gate back to Claude's judgment.** Chapter 9 adds a sentence asking Claude to be careful, but
   that's a promise, not a lock.
 
-Trust the harness, not the model: everything that must never happen has to be impossible in code, not just forbidden
-in a prompt.
+Checks in Sancho's tools help against Claude's mistakes, but they're a fence with gaps: if `read_file` refuses
+`~/.ssh`, `run_program` can still `cat` it. The real lock is one level down, in the operating system. A **container**
+is made for exactly this: Sancho runs inside it and sees only the project folder you mount, and your `~/.ssh` simply
+isn't there.
+
+Trust the harness, not the model: everything that must never happen has to be impossible in code, or better, in the
+operating system, not just forbidden in a prompt.
 
 ## Chapter 7, in which Sancho learns who he is
 
@@ -836,6 +843,9 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
   only for destructive commands, even under `--yolo`. Now the model judges and the code enforces. Who should judge:
   the model that wants to run the command, or a second one? (That is the design question behind Claude Code's auto
   mode.)
+- **Put Sancho in a container.** Write a Dockerfile, mount only the project folder, and pass in the API key. Then ask
+  Sancho to read `~/.ssh/id_rsa`. What can he still do that you wouldn't want: which of your secrets are inside the
+  container after all?
 
 ## Lessons learned
 
