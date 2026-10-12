@@ -4,10 +4,11 @@
   <img src="images/sancho.png" alt="Sancho Panza on his donkey, in color, next to a grayed-out Don Quixote" width="320">
   <br>
   <sub>Image: <a href="https://easy-peasy.ai/ai-image-generator/images/don-quijote-sancho-panza-la-mancha-spain">Easy-Peasy.AI</a>,
-  <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; everything but Sancho grayed out.</sub>
+  <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; everything but Sancho grayed out.
+  The pictures at the top of the steps were made with Gemini, from this one.</sub>
 </p>
 
-A coding agent in less than 200 lines of Python, built from scratch one small step at a time.
+A coding agent in about 250 lines of Python, built from scratch one small step at a time.
 
 # Inspiration
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
@@ -84,6 +85,8 @@ code talks to Claude.
 
 ## Step 1: a chatbot
 
+<p align="center"><img src="images/step1-sancho.jpg" alt="Sancho on his donkey, telling Don Quixote a long story with empty hands" width="300"></p>
+
 > [!TIP]
 > Code for this step: `git checkout step1`
 
@@ -124,6 +127,8 @@ This is a chatbot, not yet an agent. It can talk, but it can't do anything. That
 ![Sancho step 1: a chat in the terminal](images/step1-chat.png)
 
 ## Step 2: A fool, but with a tool
+
+<p align="center"><img src="images/step2-sancho.jpg" alt="Sancho proudly holding up a big wrench, Don Quixote puzzled" width="300"></p>
 
 > [!TIP]
 > Code for this step: `git checkout step2`
@@ -275,6 +280,8 @@ Now ask about a file that doesn't exist:
 
 ## Step 3: when tools fail
 
+<p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="300"></p>
+
 > [!TIP]
 > Code for this step: `git checkout step3`
 
@@ -322,6 +329,8 @@ Things to notice:
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
 
 ## Step 4: looking around
+
+<p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="300"></p>
 
 > [!TIP]
 > Code for this step: `git checkout step4`
@@ -395,6 +404,8 @@ Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `RE
 answered. You can watch the agent decide what to look at.
 
 ## Step 5: a coding agent
+
+<p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="300"></p>
 
 > [!TIP]
 > Code for this step: `git checkout step5`
