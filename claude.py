@@ -6,6 +6,10 @@ MODEL = "claude-sonnet-5-5"
 
 client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
 
+# Raised when Claude can't be reached: no network, overloaded, rate-limited, ...
+# (the SDK has already retried twice by then).
+Unreachable = anthropic.APIError
+
 
 def get_next_answer(conversation, tools):
     """Send the whole conversation and the tools to Claude, and return its reply."""

@@ -37,7 +37,10 @@ def main():
                 continue
 
             conversation.append({"role": "user", "content": user_input})
-            agent_loop(conversation)
+            try:
+                agent_loop(conversation)
+            except claude.Unreachable as e:
+                print(f"Sancho can't reach Claude right now: {e} Try again in a moment.")
     except (EOFError, KeyboardInterrupt):
         pass
 
