@@ -54,8 +54,67 @@ def list_folder(path=".", include_hidden=False):
     )
 
 
-DEFINITIONS = [READ_FILE, LIST_FOLDER]
-FUNCTIONS = {READ_FILE["name"]: read_file, LIST_FOLDER["name"]: list_folder}
+EDIT_FILE = {
+    "name": "edit_file",
+    "description": "Edit a file by replacing old_str with new_str. "
+    "old_str must appear exactly once in the file, so include enough surrounding lines to make it unique. "
+    "Read the file first, so old_str matches it exactly, including whitespace. "
+    "To create a new file, pass an empty old_str and the whole content as new_str.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "Path to the file, relative to the current folder.",
+            },
+            "old_str": {
+                "type": "string",
+                "description": "The exact text to replace. Empty to create a new file.",
+            },
+            "new_str": {
+                "type": "string",
+                "description": "The text to put in its place.",
+            },
+        },
+        "required": ["path", "old_str", "new_str"],
+    },
+}
+
+
+def edit_file(path, old_str, new_str):
+    if old_str == new_str:
+        raise ValueError("old_str and new_str are the same")
+
+    if old_str == "":
+        if os.path.exists(path):
+            raise ValueError(f"{path} already exists; to change it, give the text to replace")
+        folder = os.path.dirname(path)
+        if folder:
+            os.makedirs(folder, exist_ok=True)
+        with open(path, "w") as f:
+            f.write(new_str)
+        return f"Created {path}"
+
+    with open(path) as f:
+        content = f.read()
+
+    count = content.count(old_str)
+    if count == 0:
+        raise ValueError(f"old_str not found in {path}")
+    if count > 1:
+        raise ValueError(f"old_str appears {count} times in {path}; include more context to make it unique")
+
+    with open(path, "w") as f:
+        f.write(content.replace(old_str, new_str))
+    return f"Edited {path}"
+
+
+DEFINITIONS = [READ_FILE, LIST_FOLDER, EDIT_FILE]
+FUNCTIONS = {
+    READ_FILE["name"]: read_file,
+    LIST_FOLDER["name"]: list_folder,
+    EDIT_FILE["name"]: edit_file,
+}
 
 
 def run(tool_calls):

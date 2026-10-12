@@ -18,6 +18,7 @@ git checkout step1
 | [2. A fool, but with a tool](#step-2-a-fool-but-with-a-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
 | [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
 | [4. Looking around](#step-4-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
+| [5. A coding agent](#step-5-a-coding-agent) | `step5` | change files | `edit_file`: search and replace, one match only |
 
 ## Setup
 
@@ -380,9 +381,100 @@ Ask about the project without naming a file:
 Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `README.md` in the listing, read it, and
 answered. You can watch the agent decide what to look at.
 
+## Step 5: a coding agent
+
+> [!TIP]
+> Code for this step: `git checkout step5`
+
+Sancho can look around and read. The last tool lets it write: `edit_file` replaces one piece of text in a file with
+another.
+
+```python
+def edit_file(path, old_str, new_str):
+    if old_str == new_str:
+        raise ValueError("old_str and new_str are the same")
+
+    if old_str == "":
+        if os.path.exists(path):
+            raise ValueError(f"{path} already exists; to change it, give the text to replace")
+        folder = os.path.dirname(path)
+        if folder:
+            os.makedirs(folder, exist_ok=True)
+        with open(path, "w") as f:
+            f.write(new_str)
+        return f"Created {path}"
+
+    with open(path) as f:
+        content = f.read()
+
+    count = content.count(old_str)
+    if count == 0:
+        raise ValueError(f"old_str not found in {path}")
+    if count > 1:
+        raise ValueError(f"old_str appears {count} times in {path}; include more context to make it unique")
+
+    with open(path, "w") as f:
+        f.write(content.replace(old_str, new_str))
+    return f"Edited {path}"
+```
+
+Things to notice:
+
+- **Search and replace, not rewrite.** Claude sends only the text it changes, not the whole file. That's cheaper, and
+  safer: anything Claude doesn't mention stays exactly as it was, so it can't drop half a file by accident.
+- **`old_str` must appear exactly once.** If it appears twice, we don't guess which one Claude meant; we ask it for
+  more context. To know `old_str`, Claude has to have read the file, so `read_file` then `edit_file` becomes the
+  natural pattern.
+- **Every failure is a `raise`.** Step 3 turns exceptions into `is_error` results, so Claude reads "appears 2 times;
+  include more context" and tries again.
+- **The same tool creates files:** an empty `old_str` and a file that doesn't exist yet. It refuses to create over an
+  existing file, so a create can't silently overwrite.
+
+The description teaches Claude these rules:
+
+```python
+EDIT_FILE = {
+    "name": "edit_file",
+    "description": "Edit a file by replacing old_str with new_str. "
+    "old_str must appear exactly once in the file, so include enough surrounding lines to make it unique. "
+    "Read the file first, so old_str matches it exactly, including whitespace. "
+    "To create a new file, pass an empty old_str and the whole content as new_str.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "Path to the file, relative to the current folder.",
+            },
+            "old_str": {
+                "type": "string",
+                "description": "The exact text to replace. Empty to create a new file.",
+            },
+            "new_str": {
+                "type": "string",
+                "description": "The text to put in its place.",
+            },
+        },
+        "required": ["path", "old_str", "new_str"],
+    },
+}
+```
+
+Ask Sancho to change something in its own repo:
+
+![Sancho step 5: pinning its own dependency](images/step5-edit.png)
+
+It listed the folder, read `requirements.txt`, went looking in `.venv` for the installed version, and then made a
+one-line edit.
+
+That's the whole agent: an LLM, a loop, and three tools.
+
 ## Exercises
 
 - **See it think.** Sonnet 5.5 thinks before many replies, but the API returns the thinking blocks with empty text.
   Pass `thinking={"type": "adaptive", "display": "summarized"}` to `messages.create` to get a readable summary, then
   write a `claude.thinking_of(message)` next to `text_of` (the block type is `"thinking"`, its text is in
   `block.thinking`) and print it in gray. Not every reply thinks: ask something that needs a decision.
+- **Ask before writing.** `edit_file` changes files without asking. Make Sancho show the edit and ask
+  `Apply? [y/N]` first, and when you answer no, send Claude an error result saying the user declined. Where does that
+  question belong: in `tools.py`, or in `main.py`?
