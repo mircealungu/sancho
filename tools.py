@@ -24,20 +24,17 @@ DEFINITIONS = [READ_FILE]
 FUNCTIONS = {READ_FILE["name"]: read_file}
 
 
-def run(blocks):
+def run(tool_calls):
     results = []
 
-    for block in blocks:
-        if block.type != "tool_use":
-            continue
-
-        function = FUNCTIONS[block.name]
-        print(f"\033[90m🔧 {block.name}({block.input})\033[0m")
-        result = function(**block.input)
+    for call in tool_calls:
+        function = FUNCTIONS[call.name]
+        print(f"\033[90m🔧 {call.name}({call.input})\033[0m")
+        result = function(**call.input)
         results.append(
             {
                 "type": "tool_result",
-                "tool_use_id": block.id,
+                "tool_use_id": call.id,
                 "content": result,
             }
         )

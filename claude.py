@@ -17,3 +17,8 @@ def get_next_answer(conversation, tools):
 def text_of(message):
     """The text of Claude's reply, without tool calls or thinking."""
     return "".join(block.text for block in message.content if block.type == "text")
+
+
+def tool_calls_of(message):
+    """The tools Claude asks us to run in this reply."""
+    return [block for block in message.content if block.type == "tool_use"]

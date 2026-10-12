@@ -102,7 +102,10 @@ This is a chatbot, not yet an agent. It can talk, but it can't do anything. That
 
 ![Sancho step 1: a chat in the terminal](images/step1-chat.png)
 
-## Step 2: A fool, with a tool...
+## Step 2: A fool, but with a tool
+
+> [!TIP]
+> Code for this step: `git checkout step2`
 
 An agent is a chatbot that can do things. Sancho's first ability: reading a file.
 
@@ -147,4 +150,104 @@ Things to notice:
    which request this result belongs to.
 4. **We call Claude again**, without waiting for the user, until `stop_reason` is `"end_turn"`.
 
-<!-- TODO: the loop code, once it's written -->
+### Running the tools
+
+`tools.py` keeps two lookups: `DEFINITIONS`, the list we send to Claude, and `FUNCTIONS`, which maps each tool's name to
+the Python function that does the work. `run` takes the tool calls from Claude's reply and turns each one into a
+`tool_result`:
+
+```python
+def run(tool_calls):
+    results = []
+
+    for call in tool_calls:
+        function = FUNCTIONS[call.name]
+        print(f"\033[90m🔧 {call.name}({call.input})\033[0m")
+        result = function(**call.input)
+        results.append(
+            {
+                "type": "tool_result",
+                "tool_use_id": call.id,
+                "content": result,
+            }
+        )
+
+    return results
+```
+
+Things to notice:
+
+- **`**call.input` unpacks the arguments.** `call.input` is a dict like `{"path": "requirements.txt"}`, and `**` turns
+  it into `path="requirements.txt"`. So `run` works for any tool, whatever its arguments are called.
+- **The gray 🔧 line** shows every tool call as it happens, so you can watch the agent act.
+
+### The agent loop
+
+The user's turn now hands over to `agent_loop`: keep asking Claude until it stops asking for tools.
+
+```python
+def agent_loop(conversation):
+    """Keep asking Claude, and running the tools it asks for, until it's done."""
+    while True:
+        message = claude.get_next_answer(conversation, tools.DEFINITIONS)
+
+        # Every reply goes into the conversation, tool calls included: the API
+        # matches each tool_result to a tool_use in the previous assistant message,
+        # and wants the reply's thinking blocks sent back unchanged.
+        conversation.append({"role": "assistant", "content": message.content})
+
+        text = claude.text_of(message)
+        if text:
+            print("Sancho:", text)
+
+        if message.stop_reason != "tool_use":
+            return
+
+        tool_calls = claude.tool_calls_of(message)
+        results = tools.run(tool_calls)
+        conversation.append({"role": "user", "content": results})
+
+
+def main():
+    conversation = []
+    print("Sancho. At your service 🫡 (Ctrl-D to quit)")
+
+    try:
+        while True:
+            user_input = input("You: ")
+            if not user_input.strip():
+                continue
+
+            conversation.append({"role": "user", "content": user_input})
+            agent_loop(conversation)
+    except (EOFError, KeyboardInterrupt):
+        pass
+```
+
+Things to notice:
+
+- **Two loops, two turns.** The loop in `main` is your turn: it waits for input. `agent_loop` is the agent working:
+  one question from you can take several rounds with Claude, and you type nothing in between. `agent_loop` is the whole
+  difference between the chatbot of step 1 and an agent.
+- **There is one place that asks Claude.** Ask, record, show, stop if Claude is done; otherwise run the tools, answer,
+  and ask again.
+- **All results go back in one user message.** Claude can ask for several tools in one reply; the answers travel
+  together.
+- **A reply has two parts we care about:** the text to show, and the tool calls to run. `claude.text_of` and
+  `claude.tool_calls_of` pick them out of the reply's blocks (a reply can also hold `thinking` blocks, which stay in the
+  conversation untouched). Knowing the block format is `claude.py`'s job; deciding what to do with the parts is
+  `main.py`'s.
+- **We print the text of every reply**, not just the last one, so a "Let me look at that file" before a tool call isn't
+  lost.
+- **The `try` wraps the whole loop**, not just `input()`. So Ctrl-C also works while the agent is busy, and ends Sancho
+  cleanly instead of with a traceback.
+
+Ask about a file and watch Sancho read it:
+
+![Sancho step 2: reading requirements.txt](images/step2-read-file.png)
+
+Now ask about a file that doesn't exist:
+
+![Sancho step 2: crashing on a missing file](images/step2-crash.png)
+
+`open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is step 3.
