@@ -1,6 +1,13 @@
 # Sancho
 
-A coding agent built from scratch in Python, one small step at a time.
+<p align="center">
+  <img src="images/sancho.png" alt="Sancho Panza on his donkey, in color, next to a grayed-out Don Quixote" width="320">
+  <br>
+  <sub>Image: <a href="https://easy-peasy.ai/ai-image-generator/images/don-quijote-sancho-panza-la-mancha-spain">Easy-Peasy.AI</a>,
+  <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; everything but Sancho grayed out.</sub>
+</p>
+
+A coding agent in less than 200 lines of Python, built from scratch one small step at a time.
 
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
 thing in Go. His point: an agent is not magic, it's "an LLM, a loop, and enough tokens". Python lets us show that with
@@ -478,3 +485,48 @@ That's the whole agent: an LLM, a loop, and three tools.
 - **Ask before writing.** `edit_file` changes files without asking. Make Sancho show the edit and ask
   `Apply? [y/N]` first, and when you answer no, send Claude an error result saying the user declined. Where does that
   question belong: in `tools.py`, or in `main.py`?
+- **Forget old tool results.** Every turn resends the whole conversation, including every file Sancho ever read. Ask
+  about a few files, then watch `message.usage.input_tokens` grow. Make Sancho forget old tool results. Before you
+  write code: can you simply delete an old `tool_result` from the conversation? What does the API say about a
+  `tool_use` that has no answer? And what is the API's own way of doing this (look for "context editing")?
+- **No tool API.** Sancho leans on the API's tool support: tool definitions, `tool_use` and `tool_result` blocks,
+  `stop_reason`. How would it work with only the plain chat API, user and assistant taking turns with text? What
+  would the system prompt have to say about the tools, and about the format of Claude's answer? How does the loop
+  find the tool call in a reply, and what does it send back when the reply has none, or two? How does it know Claude
+  is done? (mini-swe-agent works this way: compare its `config/default.yaml`.)
+
+## Lessons learned
+
+Things that weren't obvious while building Sancho.
+
+**About the API**
+
+- **The API forgets everything.** The conversation lives in the client and is resent in full on every call. The agent
+  loop exists because of that.
+- **A reply is a list of blocks, and the first one may not be the text.** Sonnet 5.5 thinks by default, so a reply can
+  start with an (empty) `thinking` block: `message.content[0].text` prints nothing. Look for `text` blocks instead.
+- **Always record Claude's whole reply, tool calls included.** Each `tool_result` must answer a `tool_use` in the
+  assistant message right before it, and thinking blocks must go back unchanged. Appending `message.content` as it is
+  takes care of both. All results of one reply go back together, in one user message.
+
+**About tools**
+
+- **The description is a prompt.** We never told Claude to look at hidden files; it passed `include_hidden: true` on
+  its own because the description said hidden entries are left out "unless you ask for them".
+- **A failing tool should answer, not crash.** Send the exception back with `is_error: true` and Claude adapts. The
+  lookup of the tool by name belongs inside the `try` too: Claude may ask for a tool that doesn't exist.
+- **Cheap tools beat thorough ones.** A recursive listing hands Claude all of `.git` and `.venv`; one folder at a time
+  lets it explore only what it needs.
+- **Edit by search and replace, with exactly one match.** Claude sends only what changes, can't drop the rest of a file
+  by accident, and is asked for more context instead of us guessing which match it meant.
+
+**About the code**
+
+- **Turn the loop around.** "Ask once, then loop while Claude wants tools" duplicates the ask-record-show lines. "Keep
+  asking until Claude doesn't want a tool" has one place that talks to Claude.
+- **Print every reply, and exit only after printing.** Printing only the last reply loses "Let me look at that file";
+  breaking before printing loses the answer itself.
+- **Keep the provider's format in one place.** `claude.py` knows what blocks look like (`text_of`, `tool_calls_of`);
+  `main.py` decides what to do with them. Printing is the interface, so it stays out of the wrapper.
+- **A thin wrapper beats a model of our own.** Wrapping replies in our own classes leaks at once: the thinking blocks
+  must go back to the API untouched. Renaming `messages.create` to `get_next_answer` was the part worth having.
