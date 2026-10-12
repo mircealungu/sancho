@@ -31,7 +31,7 @@ git checkout step1
 | [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
 | [4. A tool for looking around](#step-4-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
 | [5. A tool for editing files](#step-5-a-tool-for-editing-files) | `step5` | change files | `edit_file`: search and replace, one match only |
-| [6. A tool for running programs](#step-6-a-tool-for-running-programs) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
+| [6. Sancho creates a powerful tool for himself](#step-6-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
 
 ## Setup
 
@@ -482,9 +482,9 @@ one-line edit.
 
 That's a coding agent: an LLM, a loop, and three tools.
 
-## Step 6: a tool for running programs
+## Step 6: Sancho creates a powerful tool for himself
 
-<p align="center"><img src="images/step6-sancho.jpg" alt="Sancho holding a smoldering linstock next to an unlit cannon, hesitating, while Don Quixote covers his ears" width="300"></p>
+<p align="center"><img src="images/step6-forge.jpg" alt="Sancho hammering a cannon barrel on an anvil, Don Quixote backing away behind his shield" width="300"></p>
 
 > [!TIP]
 > Code for this step: `git checkout step6`
@@ -540,6 +540,8 @@ def _shorten(text):
 ```
 
 ### Safety you have to ask for
+
+<p align="center"><img src="images/step6-sancho.jpg" alt="Sancho holding a smoldering linstock next to an unlit cannon, hesitating, while Don Quixote covers his ears" width="300"></p>
 
 Our first request was just "add a tool that runs a local program". Sancho built all of the above, and no
 confirmation: it would have run whatever Claude asked for. Only when we asked for it did Sancho add a question before
