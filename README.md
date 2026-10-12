@@ -30,7 +30,7 @@ git checkout step1
 | [2. A fool, but with a tool](#step-2-a-fool-but-with-a-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
 | [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
 | [4. A tool for looking around](#step-4-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
-| [5. A coding agent](#step-5-a-coding-agent) | `step5` | change files | `edit_file`: search and replace, one match only |
+| [5. A tool for editing files](#step-5-a-tool-for-editing-files) | `step5` | change files | `edit_file`: search and replace, one match only |
 
 ## Setup
 
@@ -403,7 +403,7 @@ Ask about the project without naming a file:
 Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `README.md` in the listing, read it, and
 answered. You can watch the agent decide what to look at.
 
-## Step 5: a coding agent
+## Step 5: a tool for editing files
 
 <p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="300"></p>
 
