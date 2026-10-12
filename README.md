@@ -577,6 +577,30 @@ an error result, and the message tells Claude not to simply try again.
 
 The agent engineered carefully what we asked for. What we didn't ask for, it didn't do.
 
+## What next?
+
+<p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
+
+Sancho is a complete coding agent: it can look around, read, edit, and run programs, and it can add tools to itself.
+From here, the sky's the limit. Some roads worth riding, each with a design decision waiting on it:
+
+- **Better memory.** Clear old tool results, or summarize old turns, before the conversation gets expensive. What can
+  Sancho afford to forget?
+- **A project memory.** Load a file like `CLAUDE.md` at startup, so Sancho knows the project before the first question.
+  What belongs there, and what belongs in the conversation?
+- **More tools.** Search across files, fetch a web page, look at an image. Which ones need asking first, and which
+  ones need a limit on how much they return?
+- **Safer hands.** Keep Sancho inside the project folder, show a diff before every edit, commit each change to git so
+  any step can be undone.
+- **Prompt injection.** A file Sancho reads can contain instructions. Write one that makes Sancho misbehave, then
+  defend against it.
+- **Helpers.** A tool that starts a second Sancho, with a fresh conversation, for a side task. When is a helper worth
+  it?
+- **Measure it.** A fixed set of tasks, run several times: how often does Sancho succeed, and what does it cost?
+  Compare models, tool descriptions, effort levels.
+- **Another provider.** Run Sancho on a different model API. Everything that has to change outside `claude.py` is a
+  place where the wrapper leaked.
+
 ## Exercises
 
 - **See it think.** Sonnet 5.5 thinks before many replies, but the API returns the thinking blocks with empty text.
