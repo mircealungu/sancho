@@ -541,8 +541,6 @@ def _shorten(text):
 
 ### Safety you have to ask for
 
-<p align="center"><img src="images/step6-sancho.jpg" alt="Sancho holding a smoldering linstock next to an unlit cannon, hesitating, while Don Quixote covers his ears" width="300"></p>
-
 Our first request was just "add a tool that runs a local program". Sancho built all of the above, and no
 confirmation: it would have run whatever Claude asked for. Only when we asked for it did Sancho add a question before
 every run:
