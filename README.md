@@ -117,7 +117,7 @@ This is a chatbot, not yet an agent. It can talk, but it can't do anything. That
 
 ## Chapter 2, in which Sancho gets his first tool
 
-<p align="center"><img src="images/step2-sancho.jpg" alt="Sancho proudly holding up a big wrench, Don Quixote puzzled" width="300"></p>
+<p align="center"><img src="images/step2-sancho.jpg" alt="Don Quixote handing Sancho a pair of spectacles, a letter waiting in the saddlebag" width="300"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step2`
