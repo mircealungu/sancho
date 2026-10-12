@@ -1,0 +1,5 @@
+#!/bin/sh
+# Run Sancho from any folder, using the repo's own virtual environment.
+# readlink -f resolves symlinks, so this also works when called through one.
+repo="$(dirname "$(readlink -f "$0")")"
+exec "$repo/.venv/bin/python" "$repo/main.py" "$@"
