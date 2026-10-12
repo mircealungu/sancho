@@ -33,7 +33,7 @@ git checkout step1
 | [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you | us |
 | [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change | us |
 | [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only | us |
-| **Part II, in which Sancho builds himself** | | | | |
+| **Part II, in which Sancho improves himself** | | | | |
 | [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run | Sancho |
 | [7. Sancho learns who he is](#chapter-7-in-which-sancho-learns-who-he-is) | `step7` | know his name, his folder, and his own code | a system prompt; the `sancho` command | Sancho |
 | [8. Sancho gets dressed up](#chapter-8-in-which-sancho-gets-dressed-up) | `step8` | speak in Markdown, take edited input | `rich` for output, `readline` for input | Sancho and us |
@@ -520,7 +520,7 @@ one-line edit.
 
 That's a coding agent: an LLM, a loop, and three tools.
 
-# Part II, in which Sancho builds himself
+# Part II, in which Sancho improves himself
 
 Cervantes published *Don Quixote* in two parts, and in the second, the characters have read the first. From here on,
 Sancho reads his own code and changes it: we describe what we want, and Sancho writes it.
