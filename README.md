@@ -299,3 +299,10 @@ Things to notice:
   is an answer.
 
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
+
+## Exercises
+
+- **See it think.** Sonnet 5.5 thinks before many replies, but the API returns the thinking blocks with empty text.
+  Pass `thinking={"type": "adaptive", "display": "summarized"}` to `messages.create` to get a readable summary, then
+  write a `claude.thinking_of(message)` next to `text_of` (the block type is `"thinking"`, its text is in
+  `block.thinking`) and print it in gray. Not every reply thinks: ask something that needs a decision.
