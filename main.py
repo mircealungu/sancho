@@ -39,7 +39,7 @@ def main():
 
     try:
         while True:
-            user_input = input("You: ")
+            user_input = input("\nYou: ")
 
             if user_input.strip().lower() in ["quit", "exit"]:
                 break
@@ -51,7 +51,9 @@ def main():
             try:
                 agent_loop(conversation)
             except claude.Unreachable as e:
-                print(f"Sancho can't reach Claude right now: {e} Try again in a moment.")
+                print(
+                    f"Sancho can't reach Claude right now: {e} Try again in a moment."
+                )
     except (EOFError, KeyboardInterrupt):
         pass
 
