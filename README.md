@@ -748,6 +748,10 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
 - **A better prompt.** `input()` reads one line, even with `readline`. Paste a letter with three paragraphs, and
   Sancho answers each paragraph separately, without the others. Replace `input()` with `prompt_toolkit` for multi-line
   input: once Enter adds a new line, how does the user say "I'm done, send it"?
+- **Show the work better.** Sancho shows every tool call as a raw gray line. Look at how Claude Code does it, and
+  steal: a summary per tool instead of its arguments ("Read README.md, 240 lines"), a diff for every edit, the first few
+  lines of a program's output with the rest folded away, a spinner while Claude thinks, the answer appearing word by
+  word (streaming). For each one: what does it help you notice that you'd otherwise miss?
 
 ## Lessons learned
 
