@@ -61,8 +61,7 @@ In Python the messages are plain dicts, exactly the JSON that goes over the wire
 
 <p align="center"><img src="images/step1-sancho.jpg" alt="Sancho on his donkey, telling Don Quixote a long story with empty hands" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step1`
+> **Code for this step:** `git checkout step1`
 
 The smallest useful thing: read a line, send it to Claude, print the answer, repeat.
 
@@ -119,8 +118,7 @@ This is a chatbot, not yet an agent. It can talk, but it can't do anything. That
 
 <p align="center"><img src="images/step2-sancho.jpg" alt="Sancho proudly holding up a big wrench, Don Quixote puzzled" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step2`
+> **Code for this step:** `git checkout step2`
 
 An agent is a chatbot that can do things. Sancho's first ability: reading a file.
 
@@ -271,8 +269,7 @@ Now ask about a file that doesn't exist:
 
 <p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step3`
+> **Code for this step:** `git checkout step3`
 
 A tool that fails shouldn't take Sancho down. The error is information: if Claude learns that `notex.txt` doesn't
 exist, it can say so, or try another path. So instead of crashing, we send the error back as the tool's result:
@@ -321,8 +318,7 @@ Ask about `notex.txt` again, and Sancho tells you, in its own words, that the fi
 
 <p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step4`
+> **Code for this step:** `git checkout step4`
 
 So far you have to name the file. With a second tool, `list_folder`, Sancho can look around first and find what it needs
 itself.
@@ -396,8 +392,7 @@ answered. You can watch the agent decide what to look at.
 
 <p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step5`
+> **Code for this step:** `git checkout step5`
 
 Sancho can look around and read. The last tool lets it write: `edit_file` replaces one piece of text in a file with
 another.
@@ -486,8 +481,7 @@ That's a coding agent: an LLM, a loop, and three tools.
 
 <p align="center"><img src="images/step6-forge.jpg" alt="Sancho hammering a cannon barrel on an anvil, Don Quixote backing away behind his shield" width="300"></p>
 
-> [!TIP]
-> Code for this step: `git checkout step6`
+> **Code for this step:** `git checkout step6`
 
 The last tool is the most powerful one: running programs. With it Sancho can run the tests, use git, try the code it
 just wrote. It's also the first tool whose mistakes can't be undone.
