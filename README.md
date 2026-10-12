@@ -300,6 +300,79 @@ Things to notice:
 
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
 
+## Step 4: looking around
+
+> [!TIP]
+> Code for this step: `git checkout step4`
+
+So far you have to name the file. With a second tool, `list_folder`, Sancho can look around first and find what it needs
+itself.
+
+```python
+def list_folder(path=".", include_hidden=False):
+    names = sorted(os.listdir(path))
+    if not include_hidden:
+        names = [name for name in names if not name.startswith(".")]
+    if not names:
+        return "(empty folder)"
+    return "\n".join(
+        name + "/" if os.path.isdir(os.path.join(path, name)) else name for name in names
+    )
+```
+
+We made some choices here:
+
+- **Not recursive.** On a big project a recursive listing would hand Claude thousands of names on every call. One
+  folder at a time is cheap, and Claude calls the tool again for a subfolder when it wants to look deeper.
+- **Folders end with `/`**, so Claude knows what it can look into.
+- **Hidden entries are skipped** unless Claude asks: `.git` and `.venv` are noise almost always, but sometimes it needs
+  a `.gitignore`.
+- **Sorted, and never empty.** Sorting keeps the output stable; an empty folder says so instead of returning `""`.
+
+The definition introduces two things: parameters that are optional (there is no `required` list), and a boolean.
+
+```python
+LIST_FOLDER = {
+    "name": "list_folder",
+    "description": "List what's in a folder, one name per line. Folders end with a slash. "
+    "Not recursive: to see inside a subfolder, call it again with that subfolder. "
+    "Hidden entries (starting with a dot, e.g. .gitignore) are left out unless you ask for them.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "Folder to list, relative to the current folder. Defaults to the current folder.",
+            },
+            "include_hidden": {
+                "type": "boolean",
+                "description": "Also list hidden entries. Defaults to false.",
+            },
+        },
+    },
+}
+```
+
+The description does real work again: it tells Claude that the tool isn't recursive and how to ask for hidden
+entries.
+
+And then we register it:
+
+```python
+DEFINITIONS = [READ_FILE, LIST_FOLDER]
+FUNCTIONS = {READ_FILE["name"]: read_file, LIST_FOLDER["name"]: list_folder}
+```
+
+That's all. **`run` and the agent loop don't change.** Adding a tool means writing a function, describing it, and adding
+it to the two lookups; `**call.input` takes care of the arguments, whatever they are.
+
+Ask about the project without naming a file:
+
+![Sancho step 4: exploring the project](images/step4-explore.png)
+
+Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `README.md` in the listing, read it, and
+answered. You can watch the agent decide what to look at.
+
 ## Exercises
 
 - **See it think.** Sonnet 5.5 thinks before many replies, but the API returns the thinking blocks with empty text.
