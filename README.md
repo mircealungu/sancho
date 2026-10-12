@@ -12,6 +12,13 @@ Each step below ends at a git tag (`step1`, `step2`, ...), so you can check out 
 git checkout step1
 ```
 
+| Step | Tag | What Sancho can do | What's new in the code |
+|---|---|---|---|
+| [1. A chatbot](#step-1-a-chatbot) | `step1` | talk | the chat loop; the conversation is its memory |
+| [2. A fool, with a tool](#step-2-a-fool-with-a-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
+| [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
+| [4. Looking around](#step-4-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
+
 ## Setup
 
 ```bash
