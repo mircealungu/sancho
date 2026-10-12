@@ -17,12 +17,18 @@ def main():
             continue
 
         conversation.append({"role": "user", "content": user_input})
-        message = claude.get_next_answer(conversation, tools.DEFINITIONS)
-        conversation.append({"role": "assistant", "content": message.content})
 
-        for block in message.content:
-            if block.type == "text":
-                print("Sancho:", block.text)
+        while True:
+
+            message = claude.get_next_answer(conversation, tools.DEFINITIONS)
+            conversation.append({"role": "assistant", "content": message.content})
+            claude.show(message)
+
+            if message.stop_reason != "tool_use":
+                break
+
+            results = tools.run(message.content)
+            conversation.append({"role": "user", "content": results})
 
 
 if __name__ == "__main__":

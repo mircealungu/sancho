@@ -12,3 +12,9 @@ def get_next_answer(conversation, tools):
     return client.messages.create(
         model=MODEL, max_tokens=16000, messages=conversation, tools=tools
     )
+
+
+def show(message):
+    for block in message.content:
+        if block.type == "text":
+            print("Sancho:", block.text)

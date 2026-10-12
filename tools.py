@@ -22,3 +22,23 @@ def read_file(path):
 
 DEFINITIONS = [READ_FILE]
 FUNCTIONS = {READ_FILE["name"]: read_file}
+
+
+def run(blocks):
+    results = []
+
+    for block in blocks:
+        if block.type != "tool_use":
+            continue
+
+        function = FUNCTIONS[block.name]
+        result = function(**block.input)
+        results.append(
+            {
+                "type": "tool_result",
+                "tool_use_id": block.id,
+                "content": result,
+            }
+        )
+
+    return results
