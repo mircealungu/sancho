@@ -98,7 +98,7 @@ Things to notice:
 - **`claude.get_next_answer` is the one place that talks to Claude.** It's a thin wrapper around the SDK; see the
   note below.
 
-![Sancho step 1: a chat in the terminal](images/step1-chat.png)
+<img src="images/step1-chat.png" alt="Sancho step 1: a chat in the terminal" width="640">
 
 <details>
 <summary>A note on <code>claude.py</code></summary>
@@ -259,11 +259,11 @@ Things to notice:
 
 Ask about a file and watch Sancho read it:
 
-![Sancho step 2: reading requirements.txt](images/step2-read-file.png)
+<img src="images/step2-read-file.png" alt="Sancho step 2: reading requirements.txt" width="640">
 
 Now ask about a file that doesn't exist:
 
-![Sancho step 2: crashing on a missing file](images/step2-crash.png)
+<img src="images/step2-crash.png" alt="Sancho step 2: crashing on a missing file" width="640">
 
 `open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is step 3.
 
@@ -387,7 +387,7 @@ it to the two lookups; `**call.input` takes care of the arguments, whatever they
 
 Ask about the project without naming a file:
 
-![Sancho step 4: exploring the project](images/step4-explore.png)
+<img src="images/step4-explore.png" alt="Sancho step 4: exploring the project" width="640">
 
 Claude called `list_folder({})`: no arguments, so the defaults apply. It saw `README.md` in the listing, read it, and
 answered. You can watch the agent decide what to look at.
@@ -475,7 +475,7 @@ EDIT_FILE = {
 
 Ask Sancho to change something in its own repo:
 
-![Sancho step 5: pinning its own dependency](images/step5-edit.png)
+<img src="images/step5-edit.png" alt="Sancho step 5: pinning its own dependency" width="640">
 
 It listed the folder, read `requirements.txt`, went looking in `.venv` for the installed version, and then made a
 one-line edit.
@@ -494,7 +494,7 @@ just wrote. It's also the first tool whose mistakes can't be undone.
 
 We didn't write this one. We asked Sancho to add it to itself:
 
-![Sancho adding a tool to its own code](images/step6-build.png)
+<img src="images/step6-build.png" alt="Sancho adding a tool to its own code" width="640">
 
 It looked around, read its own code, said what it would do ("a definition, a function, and an entry in the two
 lookups"), and made small edits, each with an `old_str` that appears exactly once.
@@ -576,6 +576,12 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
   Sancho afford to forget?
 - **A project memory.** Load a file like `CLAUDE.md` at startup, so Sancho knows the project before the first question.
   What belongs there, and what belongs in the conversation?
+- **Skills.** Folders of instructions (and scripts) for particular jobs: "how we write release notes", "how to
+  deploy". Only their names and one-line descriptions sit in the conversation; Sancho reads a skill's full text when
+  a task needs it. How is that different from a tool, and what does it save?
+- **Permissions.** Step 6 asks y/N before every run. Real agents grow that into rules: "always allow `pytest`", "never
+  `git push`", "ask for anything outside this folder", modes for when you're watching and when you're not. Where do the
+  rules live, and who may change them?
 - **More tools.** Search across files, fetch a web page, look at an image. Which ones need asking first, and which
   ones need a limit on how much they return?
 - **Safer hands.** Keep Sancho inside the project folder, show a diff before every edit, commit each change to git so
