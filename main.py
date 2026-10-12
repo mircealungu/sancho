@@ -1,7 +1,14 @@
 """Sancho: a basic chat agent, inspired by Thorsten Ball's "How to Build an Agent"."""
 
+import readline  # importing it is enough: input() gets line editing and history
+
+from rich.console import Console
+from rich.markdown import Markdown
+
 import claude
 import tools
+
+console = Console()
 
 
 def agent_loop(conversation):
@@ -16,7 +23,7 @@ def agent_loop(conversation):
 
         text = claude.text_of(message)
         if text:
-            print("Sancho:", text)
+            console.print("Sancho:", Markdown(text))
 
         if message.stop_reason != "tool_use":
             return
