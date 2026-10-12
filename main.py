@@ -4,6 +4,12 @@ import claude
 import tools
 
 
+def show(message):
+    text = claude.text_of(message)
+    if text:
+        print("Sancho:", text)
+
+
 def main():
     conversation = []
     print("Sancho. At your service 🫡 (Ctrl-D to quit)")
@@ -19,10 +25,9 @@ def main():
         conversation.append({"role": "user", "content": user_input})
 
         while True:
-
             message = claude.get_next_answer(conversation, tools.DEFINITIONS)
             conversation.append({"role": "assistant", "content": message.content})
-            claude.show(message)
+            show(message)
 
             if message.stop_reason != "tool_use":
                 break

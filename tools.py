@@ -32,6 +32,7 @@ def run(blocks):
             continue
 
         function = FUNCTIONS[block.name]
+        print(f"\033[90m🔧 {block.name}({block.input})\033[0m")
         result = function(**block.input)
         results.append(
             {
