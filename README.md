@@ -29,7 +29,7 @@ git checkout step1
 | [1. A chatbot](#step-1-a-chatbot) | `step1` | talk | the chat loop; the conversation is its memory |
 | [2. A fool, but with a tool](#step-2-a-fool-but-with-a-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
 | [3. When tools fail](#step-3-when-tools-fail) | `step3` | survive a missing file | errors go back to Claude with `is_error` |
-| [4. Looking around](#step-4-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
+| [4. A tool for looking around](#step-4-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
 | [5. A coding agent](#step-5-a-coding-agent) | `step5` | change files | `edit_file`: search and replace, one match only |
 
 ## Setup
@@ -328,7 +328,7 @@ Things to notice:
 
 Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.
 
-## Step 4: looking around
+## Step 4: a tool for looking around
 
 <p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="300"></p>
 
