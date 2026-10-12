@@ -27,11 +27,13 @@ git checkout step1
 
 | Chapter | Tag | What Sancho can do | What's new in the code | Written by |
 |---|---|---|---|---|
+| **Part I, in which we build Sancho** | | | | |
 | [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory | us |
 | [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent | us |
 | [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you | us |
 | [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change | us |
 | [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only | us |
+| **Part II, in which Sancho builds himself** | | | | |
 | [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run | Sancho |
 | [7. Sancho learns who he is](#chapter-7-in-which-sancho-learns-who-he-is) | `step7` | know his name, his folder, and his own code | a system prompt; the `sancho` command | Sancho |
 | [8. Sancho gets dressed up](#chapter-8-in-which-sancho-gets-dressed-up) | `step8` | speak in Markdown, take edited input | `rich` for output, `readline` for input | Sancho and us |
@@ -60,6 +62,10 @@ Sancho talks to Claude through the Messages API. The whole agent rests on four f
    will mean Claude wants us to run something.
 
 In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what the API sees.
+
+# Part I, in which we build Sancho
+
+In the first five chapters we write every line ourselves: a chat loop, then the tools that make it an agent.
 
 ## Chapter 1, in which Sancho learns to talk
 
@@ -513,6 +519,11 @@ It listed the folder, read `requirements.txt`, went looking in `.venv` for the i
 one-line edit.
 
 That's a coding agent: an LLM, a loop, and three tools.
+
+# Part II, in which Sancho builds himself
+
+Cervantes published *Don Quixote* in two parts, and in the second, the characters have read the first. From here on,
+Sancho reads his own code and changes it: we describe what we want, and Sancho writes it.
 
 ## Chapter 6, in which Sancho creates a powerful tool for himself
 
