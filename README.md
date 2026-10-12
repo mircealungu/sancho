@@ -251,3 +251,51 @@ Now ask about a file that doesn't exist:
 ![Sancho step 2: crashing on a missing file](images/step2-crash.png)
 
 `open()` raises `FileNotFoundError`, nothing catches it, and Sancho dies. Fixing that is step 3.
+
+## Step 3: when tools fail
+
+> [!TIP]
+> Code for this step: `git checkout step3`
+
+A tool that fails shouldn't take Sancho down. The error is information: if Claude learns that `notex.txt` doesn't
+exist, it can say so, or try another path. So instead of crashing, we send the error back as the tool's result:
+
+```python
+def run(tool_calls):
+    results = []
+
+    for call in tool_calls:
+        try:
+            print(f"\033[90m🔧 {call.name}({call.input})\033[0m")
+            function = FUNCTIONS[call.name]
+            result = function(**call.input)
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": call.id,
+                    "content": result,
+                }
+            )
+        except Exception as e:
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": call.id,
+                    "content": str(e),
+                    "is_error": True,
+                }
+            )
+
+    return results
+```
+
+Things to notice:
+
+- **`"is_error": True`** tells Claude the tool failed, so it reads `str(e)` as an error message and not as the file's
+  contents.
+- **The lookup is inside the `try` too.** If Claude asks for a tool that doesn't exist, `FUNCTIONS[block.name]` raises
+  `KeyError`, and that becomes an error result as well.
+- **Every `tool_use` still gets exactly one `tool_result`.** The API requires an answer for each request, and failing
+  is an answer.
+
+Ask about `notex.txt` again, and Sancho tells you, in its own words, that the file isn't there.

@@ -28,15 +28,25 @@ def run(tool_calls):
     results = []
 
     for call in tool_calls:
-        function = FUNCTIONS[call.name]
-        print(f"\033[90m🔧 {call.name}({call.input})\033[0m")
-        result = function(**call.input)
-        results.append(
-            {
-                "type": "tool_result",
-                "tool_use_id": call.id,
-                "content": result,
-            }
-        )
+        try:
+            print(f"\033[90m🔧 {call.name}({call.input})\033[0m")
+            function = FUNCTIONS[call.name]
+            result = function(**call.input)
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": call.id,
+                    "content": result,
+                }
+            )
+        except Exception as e:
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": call.id,
+                    "content": str(e),
+                    "is_error": True,
+                }
+            )
 
     return results
