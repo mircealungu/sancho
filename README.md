@@ -805,7 +805,7 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
 - **More tools.** Search across files, fetch a web page, look at an image. Which ones need asking first, and which
   ones need a limit on how much they return?
 - **Safer hands.** Keep Sancho inside the project folder, show a diff before every edit, commit each change to git so
-  any change can be undone.
+  any change can be undone. And for the limits that must hold no matter what Claude says, run him in a container.
 - **Prompt injection.** A file Sancho reads can contain instructions. Write one that makes Sancho misbehave, then
   defend against it.
 - **Helpers.** A tool that starts a second Sancho, with a fresh conversation, for a side task. When is a helper worth
