@@ -25,14 +25,16 @@ tags hold the code; this README, on `main`, tells the whole story:
 git checkout step1
 ```
 
-| Chapter | Tag | What Sancho can do | What's new in the code |
-|---|---|---|---|
-| [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory |
-| [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent |
-| [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you |
-| [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change |
-| [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only |
-| [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run |
+| Chapter | Tag | What Sancho can do | What's new in the code | Written by |
+|---|---|---|---|---|
+| [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory | us |
+| [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent | us |
+| [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you | us |
+| [4. Sancho gets a tool for looking around](#chapter-4-in-which-sancho-gets-a-tool-for-looking-around) | `step4` | find files itself | a second tool; the loop doesn't change | us |
+| [5. Sancho gets a tool for editing](#chapter-5-in-which-sancho-gets-a-tool-for-editing) | `step5` | change files | `edit_file`: search and replace, one match only | us |
+| [6. Sancho creates a powerful tool for himself](#chapter-6-in-which-sancho-creates-a-powerful-tool-for-himself) | `step6` | run programs, after asking | `run_program`, written by Sancho; confirmation before every run | Sancho |
+| [7. Sancho learns who he is](#chapter-7-in-which-sancho-learns-who-he-is) | `step7` | know his name, his folder, and his own code | a system prompt; the `sancho` command | Sancho |
+| [8. Sancho gets dressed up](#chapter-8-in-which-sancho-gets-dressed-up) | `step8` | speak in Markdown, take edited input | `rich` for output, `readline` for input | Sancho and us |
 
 ## Setup
 
@@ -594,6 +596,100 @@ an error result, and the message tells Claude not to simply try again.
 
 The agent engineered carefully what we asked for. What we didn't ask for, it didn't do.
 
+### Saying yes, again and again
+
+Now use Sancho for a while. Asked "are we done with the seventh step?", it ran `git status`, `git log`, `git diff` and
+`git tag`, and each one needed a "y". After an hour you stop reading the commands and just type `y`, and then the
+question protects nothing.
+
+This is why Claude Code keeps asking for permission, and why every coding agent ends up choosing between three
+imperfect answers:
+
+- **Ask every time.** Safe as long as you read, tiring, and soon you don't read.
+- **Let something else decide.** Claude Code's auto mode has a classifier allow the harmless calls and ask about the
+  risky ones. Fewer questions, but now you trust a second model's judgment.
+- **Never ask, and limit the damage instead.** Mario Zechner's pi runs "YOLO": no permission prompts at all, on the
+  argument that the agent should run where it can't do much harm (a container, a throwaway checkout, git to undo).
+
+None of them is great. It's the same trade-off as with any assistant you give real power to: the more of its work you
+have to check, the less work it saves you. Which brings me to one of my research project ideas: a fleet of many specialized limited agents.
+
+## Chapter 7, in which Sancho learns who he is
+
+<p align="center"><img src="images/step7-sancho.jpg" alt="Don Quixote holding up a mirror in which Sancho sees himself for the first time" width="300"></p>
+
+> [!NOTE]
+> Code for this chapter: `git checkout step7`
+
+Until now, Claude didn't know it was Sancho. Asked about itself, it said "I can't tell whether this session actually
+runs through Sancho". It got the conversation and the tools, and nothing else.
+
+The third input to the API, next to `messages` and `tools`, is the **system prompt**: text that frames the whole
+conversation. Sancho wrote his own, in `claude.py`, and `get_next_answer` passes it as `system=SYSTEM_PROMPT`:
+
+```python
+OWN_CODE_FOLDER = os.path.dirname(os.path.abspath(__file__))
+
+SYSTEM_PROMPT = f"""\
+You are Sancho, a small coding agent running in a terminal.
+You have four tools: read_file, list_folder, edit_file and run_program.
+You work in {os.getcwd()}, the folder the user started you in.
+Your own code is in {OWN_CODE_FOLDER}, so you can read it to learn how you work.
+If you change your own code, the changes take effect only after the user restarts you.
+Keep your answers short: they are shown in a terminal."""
+```
+
+Things to notice:
+
+- **Two folders, and they're often different.** Sancho works in the folder you start it in (`os.getcwd()`), but its own
+  code lives where `claude.py` is (`__file__`). When the two are the same, Sancho is working on itself.
+- **Working on yourself has a catch.** A running program doesn't see changes to its own code until it's restarted, so
+  the prompt says so. We learned that the hard way, more than once.
+- **Keep it short.** A system prompt isn't the place for rules the code already enforces: confirmation before running a
+  program is in `confirm()`, where it can't be talked out of.
+
+To use Sancho in any project, the repo has a five-line launcher, also written by Sancho:
+
+```sh
+#!/bin/sh
+# Run Sancho from any folder, using the repo's own virtual environment.
+# readlink -f resolves symlinks, so this also works when called through one.
+repo="$(dirname "$(readlink -f "$0")")"
+exec "$repo/.venv/bin/python" "$repo/main.py" "$@"
+```
+
+Link it into a folder on your `PATH` (`ln -s ~/repos/code/sancho/sancho ~/.local/bin/sancho`), and `sancho` starts in
+whatever folder you're in. Because it's a link to the repo, every change to Sancho reaches the command too.
+
+## Chapter 8, in which Sancho gets dressed up
+
+<p align="center"><img src="images/step8-sancho.jpg" alt="A tailor fitting Sancho into a governor's red embroidered robe and feathered hat, Don Quixote watching, amused" width="300"></p>
+
+> [!NOTE]
+> Code for this chapter: `git checkout step8`
+
+Claude writes Markdown: lists, **bold**, `code`. In a terminal that shows up as asterisks and backticks. The `rich`
+library renders it properly, and `main.py` needs two imports and one changed line:
+
+```python
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
+...
+        if text:
+            console.print("Sancho:", Markdown(text))
+```
+
+The input side was worse: `input()` turns the arrow keys into `^[[D`, and has no history. One line from the standard
+library fixes both:
+
+```python
+import readline  # importing it is enough: input() gets line editing and history
+```
+
+Sancho added `rich` himself; the `readline` line is ours.
+
 ## Epilogue, or the road ahead
 
 <p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
@@ -642,6 +738,9 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
   would the system prompt have to say about the tools, and about the format of Claude's answer? How does the loop
   find the tool call in a reply, and what does it send back when the reply has none, or two? How does it know Claude
   is done? (mini-swe-agent works this way: compare its `config/default.yaml`.)
+- **A better prompt.** `input()` reads one line, even with `readline`. Paste a letter with three paragraphs, and
+  Sancho answers each paragraph separately, without the others. Replace `input()` with `prompt_toolkit` for multi-line
+  input: once Enter adds a new line, how does the user say "I'm done, send it"?
 
 ## Lessons learned
 
@@ -669,6 +768,9 @@ Things that weren't obvious while building Sancho.
   by accident, and is asked for more context instead of us guessing which match it meant.
 - **Safety you have to ask for.** Asked to add a tool that runs programs, Sancho added timeouts, output limits and no
   shell, but no confirmation. The agent does carefully what it is asked, and nothing it isn't.
+
+- **The input is part of the agent.** A pasted letter arrived as six messages, one per line, and Claude answered each
+  without the others. What the model sees depends on how the terminal hands your text over.
 
 **About the code**
 
