@@ -27,7 +27,7 @@ git checkout step1
 
 | Chapter | Tag | What Sancho can do | What's new in the code | Written by |
 |---|---|---|---|---|
-| **Part I, in which we build Sancho** | | | | |
+| **Part I, in which we build a basic coding agent** | | | | |
 | [1. Sancho learns to talk](#chapter-1-in-which-sancho-learns-to-talk) | `step1` | talk | the chat loop; the conversation is its memory | us |
 | [2. Sancho gets his first tool](#chapter-2-in-which-sancho-gets-his-first-tool) | `step2` | read a file | tool definitions, and the inner loop that makes it an agent | us |
 | [3. Things break and Sancho carries on](#chapter-3-in-which-things-break-and-sancho-carries-on) | `step3` | survive a missing file, or a lost connection | tool errors go back to Claude; connection errors go to you | us |
@@ -63,7 +63,7 @@ Sancho talks to Claude through the Messages API. The whole agent rests on four f
 
 In Python the messages are plain dicts, exactly the JSON that goes over the wire, so what you read in the code is what the API sees.
 
-# Part I, in which we build Sancho
+# Part I, in which we build a basic coding agent
 
 In the first five chapters we write every line ourselves: a chat loop, then the tools that make it an agent.
 
