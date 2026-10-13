@@ -891,3 +891,7 @@ Things that weren't obvious while building Sancho.
   `main.py` decides what to do with them. Printing is the interface, so it stays out of the wrapper.
 - **A thin wrapper beats a model of our own.** Wrapping replies in our own classes leaks at once: the thinking blocks
   must go back to the API untouched. Renaming `messages.create` to `get_next_answer` was the part worth having.
+
+## Sandboxing
+
+Sancho runs model-generated shell commands, so tool execution should be sandboxed. Sandbox the tool, not the loop: the loop needs network access and the API key; the bash tool needs neither. Scrub env vars (e.g. ANTHROPIC_API_KEY) before spawning tool processes. On macOS use Seatbelt (`sandbox-exec -f agent.sb ...`), on Linux bubblewrap, or Anthropic's `srt` (https://github.com/anthropic-experimental/sandbox-runtime) for both plus domain allowlists. Notes: see sandboxing-agents.md in my vault.
