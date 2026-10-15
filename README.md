@@ -791,8 +791,9 @@ From here, the sky's the limit. Some roads worth riding, each with a design deci
 
 Sancho must protect us from... Claude!
 
-Sancho's mind is Claude, and his job is to protect us from it. Claude never touches your machine. It can only ask;
-Sancho decides what actually happens. That makes Sancho the gate
+Sancho's mind is Claude, and one of his jobs is to protect us from it! 
+
+Claude never touches your machine. It can only ask; Sancho decides what actually happens. That makes Sancho the gate
 between a model we don't control and the computer we care about, and the gate is our code.
 
 Claude can go wrong in two ways: it makes a mistake, or it gets steered by something it reads. A README, a web page or
