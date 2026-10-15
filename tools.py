@@ -144,8 +144,17 @@ RUN_PROGRAM = {
 }
 
 
+def _command(program, args):
+    """The program and its arguments as one list. args must be a list: list("status") would be 6 letters."""
+    if args is None:
+        args = []
+    if not isinstance(args, list) or not all(isinstance(a, str) for a in args):
+        raise TypeError(f'args must be a list of strings, e.g. ["status"], not {args!r}')
+    return [program] + args
+
+
 def run_program(program, args=None, timeout_seconds=DEFAULT_TIMEOUT):
-    command = [program] + list(args or [])
+    command = _command(program, args)
     try:
         completed = subprocess.run(
             command,
@@ -191,7 +200,7 @@ def confirm(call):
     """Ask the user before running a tool that acts on the world. Raises if they decline."""
     if yolo:
         return
-    command = shlex.join([call.input.get("program", "")] + list(call.input.get("args") or []))
+    command = shlex.join(_command(call.input.get("program", ""), call.input.get("args")))
     try:
         answer = input(f"\033[33mRun `{command}`? [y/N] \033[0m")
     except EOFError:  # Ctrl-D: no answer is a no
