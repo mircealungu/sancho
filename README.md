@@ -1,7 +1,7 @@
 # Sancho
 
 <p align="center">
-  <img src="images/sancho.png" alt="Sancho Panza on his donkey, in color, next to a grayed-out Don Quixote" width="320">
+  <img src="images/sancho.png" alt="Sancho Panza on his donkey, in color, next to a grayed-out Don Quixote" width="480">
   <br>
   <sub>Image: <a href="https://easy-peasy.ai/ai-image-generator/images/don-quijote-sancho-panza-la-mancha-spain">Easy-Peasy.AI</a>,
   <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; everything but Sancho grayed out.
@@ -69,7 +69,7 @@ In the first five chapters we write every line ourselves: a chat loop, then the 
 
 ## Chapter 1, in which Sancho learns to talk
 
-<p align="center"><img src="images/step1-sancho.jpg" alt="Sancho on his donkey, telling Don Quixote a long story with empty hands" width="300"></p>
+<p align="center"><img src="images/step1-sancho.jpg" alt="Sancho on his donkey, telling Don Quixote a long story with empty hands" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step1`
@@ -127,7 +127,7 @@ This is a chatbot, not yet an agent. It can talk, but it can't do anything. That
 
 ## Chapter 2, in which Sancho gets his first tool
 
-<p align="center"><img src="images/step2-sancho.jpg" alt="Don Quixote handing Sancho a pair of spectacles, a letter waiting in the saddlebag" width="300"></p>
+<p align="center"><img src="images/step2-sancho.jpg" alt="Don Quixote handing Sancho a pair of spectacles, a letter waiting in the saddlebag" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step2`
@@ -279,7 +279,7 @@ Now ask about a file that doesn't exist:
 
 ## Chapter 3, in which things break and Sancho carries on
 
-<p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="300"></p>
+<p align="center"><img src="images/step3-sancho.jpg" alt="Sancho shrugging next to a broken pickaxe and a smashed wheel" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step3`
@@ -357,7 +357,7 @@ wait.
 
 ## Chapter 4, in which Sancho gets a second tool, for looking around
 
-<p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="300"></p>
+<p align="center"><img src="images/step4-sancho.jpg" alt="Sancho on his donkey, looking through a spyglass" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step4`
@@ -432,7 +432,7 @@ answered. You can watch the agent decide what to look at.
 
 ## Chapter 5, in which Sancho gets a third tool, for editing
 
-<p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="300"></p>
+<p align="center"><img src="images/step5-sancho.jpg" alt="Sancho on a ladder, hammering the sail of a windmill back into place" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step5`
@@ -527,7 +527,7 @@ Sancho reads his own code and changes it: we describe what we want, and Sancho w
 
 ## Chapter 6, in which Sancho creates a powerful tool for himself
 
-<p align="center"><img src="images/step6-forge.jpg" alt="Sancho hammering a cannon barrel on an anvil, Don Quixote backing away behind his shield" width="300"></p>
+<p align="center"><img src="images/step6-forge.jpg" alt="Sancho hammering a cannon barrel on an anvil, Don Quixote backing away behind his shield" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step6`
@@ -660,7 +660,7 @@ operating system, not just forbidden in a prompt.
 
 ## Chapter 7, in which Sancho learns who he is
 
-<p align="center"><img src="images/step7-sancho.jpg" alt="Don Quixote holding up a mirror in which Sancho sees himself for the first time" width="300"></p>
+<p align="center"><img src="images/step7-sancho.jpg" alt="Don Quixote holding up a mirror in which Sancho sees himself for the first time" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step7`
@@ -707,7 +707,7 @@ whatever folder you're in. Because it's a link to the repo, every change to Sanc
 
 ## Chapter 8, in which Sancho gets dressed up
 
-<p align="center"><img src="images/step8-sancho.jpg" alt="A tailor fitting Sancho into a governor's red embroidered robe and feathered hat, Don Quixote watching, amused" width="300"></p>
+<p align="center"><img src="images/step8-sancho.jpg" alt="A tailor fitting Sancho into a governor's red embroidered robe and feathered hat, Don Quixote watching, amused" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step8`
@@ -740,7 +740,7 @@ Sancho added `rich` himself; the `readline` line and the last touches are ours.
 
 ## Chapter 9, in which Sancho is let off the leash
 
-<p align="center"><img src="images/step9-sancho.jpg" alt="Sancho on a hilltop with his own banner, the cannon behind him with its fuse lit, Don Quixote far below waving 'wait!'" width="300"></p>
+<p align="center"><img src="images/step9-sancho.jpg" alt="Sancho on a hilltop with his own banner, the cannon behind him with its fuse lit, Don Quixote far below waving 'wait!'" width="450"></p>
 
 > [!NOTE]
 > Code for this chapter: `git checkout step9`
@@ -784,7 +784,7 @@ Things to notice:
 
 ## Epilogue, or the road ahead
 
-<p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="300"></p>
+<p align="center"><img src="images/what-next-sancho.jpg" alt="Sancho and Don Quixote riding away into a wide sunset sky, the donkey loaded with all their tools" width="450"></p>
 
 Sancho is a complete coding agent: it can look around, read, edit, and run programs, and it can add tools to itself.
 From here, the sky's the limit. Some roads worth riding, each with a design decision waiting on it:
