@@ -8,7 +8,7 @@
   The pictures at the top of the chapters were made with Gemini, from this one.</sub>
 </p>
 
-A coding agent in under 400 lines of Python, built from scratch one small step at a time.
+A coding agent in under 400 lines of Python, built from scratch one small step at a time. After about 200 lines, it helps modify and improve itself so you don't really have to write code anymore. 
 
 # Inspiration
 Sancho follows Thorsten Ball's [How to Build an Agent](https://ampcode.com/how-to-build-an-agent), which builds the same
